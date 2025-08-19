@@ -19,7 +19,7 @@ movici-simulation-core = {version = "2.10.4", extras = ["models"]}
 numba = "0.57.1"
 orjson = "^3.9.1"
 pydantic = "^1.10.9"
-python = "^3.8"
+python = "^3.10"
 uvicorn = {extras = ["standard"], version = "^0.22.0"}
 
 pytest = {version = "^6.2.5", optional = true}

@@ -1,4 +1,3 @@
-import typing as t
 from pathlib import Path
 
 import click
@@ -10,13 +9,13 @@ from starlette.responses import RedirectResponse
 
 from .dependencies import get_settings
 from .exceptions import add_exception_handling
-from .routers import scenario_router, dataset_router, update_router, view_router
+from .routers import dataset_router, scenario_router, update_router, view_router
 from .settings import Settings
 
 __UI_DIR__ = Path(__file__).parent / "ui"
 
 
-def get_app(settings: t.Optional[Settings] = None, mount_ui=True, allow_cors=False):
+def get_app(settings: Settings | None = None, mount_ui=True, allow_cors=False):
     app = FastAPI()
     if settings is not None:
         app.dependency_overrides[get_settings] = lambda: settings

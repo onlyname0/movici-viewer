@@ -1,0 +1,119 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  backend-tests:
+    name: Backend Tests (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: latest
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+    
+    - name: Load cached venv
+      id: cached-poetry-dependencies
+      uses: actions/cache@v4
+      with:
+        path: server/.venv
+        key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+    
+    - name: Install dependencies
+      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+      run: |
+        cd server
+        poetry install --no-interaction --no-root --extras dev
+    
+    - name: Install project
+      run: |
+        cd server
+        poetry install --no-interaction --extras dev
+    
+    - name: Run linting
+      if: matrix.python-version == '3.11'
+      run: |
+        cd server
+        poetry run ruff check .
+    
+    - name: Run formatting check
+      if: matrix.python-version == '3.11'
+      run: |
+        cd server
+        poetry run ruff format --check .
+    
+    - name: Run tests with coverage
+      run: |
+        cd server
+        poetry run pytest tests/ --cov=movici_viewer --cov-report=term-missing --cov-report=xml
+    
+    - name: Upload coverage reports
+      if: matrix.python-version == '3.11'
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./server/coverage.xml
+        flags: backend
+        name: backend-coverage
+
+  frontend-tests:
+    name: Frontend Tests (Node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18, 20]
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: npm
+        cache-dependency-path: client/package-lock.json
+    
+    - name: Install dependencies
+      run: |
+        cd client
+        npm ci
+    
+    - name: Run linting
+      run: |
+        cd client
+        npm run lint
+    
+    - name: Run type checking
+      run: |
+        cd client
+        npm run type-check
+    
+    - name: Run tests
+      run: |
+        cd client
+        npm run test:unit
+    
+    - name: Build frontend
+      run: |
+        cd client
+        npm run build

@@ -12,6 +12,12 @@ ui:
 build: ui
 	cd server && poetry build
 
+lint:
+	cd server && ruff check .
+
+format:
+	cd server && ruff format .
+
 pre-init:
 	cd client && npm install
 	mkdir -p server/movici_viewer/ui

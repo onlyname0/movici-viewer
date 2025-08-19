@@ -16,6 +16,18 @@ lint:
 
 format:
 	cd server && ruff format .
+
+test:
+	cd server && pytest tests/
+
+coverage:
+	cd server && pytest tests/ --cov=movici_viewer --cov-report=term-missing
+
+pre-commit-install:
+	cd server && pre-commit install
+
+pre-commit-run:
+	cd server && pre-commit run --all-files
 	cd server && poetry build
 
 pre-init:

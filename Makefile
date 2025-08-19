@@ -10,6 +10,12 @@ ui:
 	cp -r client/dist/* server/movici_viewer/ui
 
 build: ui
+
+lint:
+	cd server && ruff check .
+
+format:
+	cd server && ruff format .
 	cd server && poetry build
 
 pre-init:

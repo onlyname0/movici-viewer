@@ -26,25 +26,4 @@ pytest = {version = "^6.2.5", optional = true}
 httpx = {version = "^0.24.1", optional = true}
 
 [tool.poetry.extras]
-dev = ["httpx", "pytest"]
-
-[tool.black]
-exclude = '''(
-/(
-  | \.direnv
-  | \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | _build
-  | buck-out
-  | build
-  | dist
-  | venv
-)/
-)
-'''
-include = '\.pyi?$'
-line-length = 99
+dev = ["httpx", "pytest", "ruff"]
